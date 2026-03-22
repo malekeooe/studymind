@@ -310,7 +310,7 @@ transition: border-color .2s, box-shadow .2s;
   <div class="card">
     <div class="card-icon">🎓</div>
     <div class="card-title">StudyMind Pro</div>
-    <div class="card-sub">Powered by Google Gemini – gib einmalig deinen kostenlosen API-Key ein!</div>
+    <div class="card-sub">Powered by Google Gemini – gib deinen kostenlosen API-Key ein!</div>
     <div class="feat-chips">
       <span class="fc">🧠 Thinking Mode</span>
       <span class="fc">📊 PowerPoint</span>
@@ -323,17 +323,16 @@ transition: border-color .2s, box-shadow .2s;
     <input
       id="keyInput"
       class="key-input"
-      type="password"
+      type="text"
       placeholder="AIzaSy..."
       autocomplete="off"
-      oninput="onKeyInput()"
-      onkeydown="if(event.key==='Enter') tryStart()"
     >
     <div class="key-hint">
       Kostenlos auf <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> → „Get API Key" → kopieren &amp; einfügen
     </div>
-    <button id="goBtn" class="go-btn" onclick="tryStart()" style="opacity:0.4;background:rgba(150,160,190,.5);box-shadow:none;cursor:not-allowed;">🚀 Loslegen</button>
-    <div class="key-note">Dein Key bleibt nur auf deinem Gerät – nicht im Code gespeichert</div>
+    <div id="keyErr" style="color:#ef4444;font-size:12px;font-weight:700;margin-bottom:8px;display:none;">⚠️ Bitte einen gültigen API-Key eingeben!</div>
+    <button class="go-btn" onclick="tryStart()">🚀 Loslegen</button>
+    <div class="key-note">Dein Key bleibt nur auf deinem Gerät</div>
   </div>
 </div>
 
@@ -425,29 +424,12 @@ if (typeof pdfjsLib !== 'undefined') {
 }
 
 // ── Splash / Login ─────────────────────────────────────
-function onKeyInput() {
-  const val = document.getElementById('keyInput').value.trim();
-  const btn = document.getElementById('goBtn');
-  if (val.length >= 10) {
-    btn.style.opacity = '1';
-    btn.style.background = 'linear-gradient(135deg, #5b8def, #7c6fef)';
-    btn.style.boxShadow = '0 6px 20px rgba(91,141,239,.42)';
-    btn.style.cursor = 'pointer';
-  } else {
-    btn.style.opacity = '0.4';
-    btn.style.background = 'rgba(150,160,190,.5)';
-    btn.style.boxShadow = 'none';
-    btn.style.cursor = 'not-allowed';
-  }
-}
-
 function tryStart() {
-  const key = document.getElementById('keyInput').value.trim();
+  var key = document.getElementById('keyInput').value.trim();
+  var errEl = document.getElementById('keyErr');
   if (!key || key.length < 10) {
-    const input = document.getElementById('keyInput');
-    input.style.borderColor = '#ef4444';
-    input.placeholder = 'Bitte API-Key eingeben (beginnt mit AIza...)';
-    setTimeout(() => { input.style.borderColor = ''; input.placeholder = 'AIzaSy...'; }, 2000);
+    errEl.style.display = 'block';
+    setTimeout(function() { errEl.style.display = 'none'; }, 3000);
     return;
   }
   API_KEY = key;
