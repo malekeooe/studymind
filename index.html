@@ -1,16 +1,573 @@
 <!DOCTYPE html>
 
-<html>
-<head><meta charset="UTF-8"><title>JS Test</title></head>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StudyMind">
+<meta name="theme-color" content="#e8f0fe">
+<title>StudyMind Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family: 'Nunito', -apple-system, sans-serif;
+  background: linear-gradient(145deg,#e8f0fe,#f3e8ff,#fce8f3,#e8f6fe);
+  min-height: 100vh; min-height: 100dvh;
+  color: #1a1a2e;
+}
+
+/* Splash */
+#splash {
+position: fixed; inset: 0; z-index: 99;
+display: flex; align-items: center; justify-content: center; padding: 24px;
+background: rgba(232,240,254,0.92);
+}
+.card {
+background: rgba(255,255,255,0.95);
+border-radius: 24px; padding: 32px 24px;
+text-align: center; max-width: 360px; width: 100%;
+box-shadow: 0 8px 40px rgba(100,120,200,0.18);
+}
+.card-icon { font-size: 52px; display: block; margin-bottom: 12px; }
+.card-title {
+font-size: 24px; font-weight: 900; margin-bottom: 8px;
+background: linear-gradient(135deg,#5b8def,#a78bfa);
+-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.card-sub { font-size: 13px; color: #5a6080; margin-bottom: 20px; line-height: 1.6; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 22px; }
+.chip { padding: 4px 11px; border-radius: 9px; font-size: 11px; font-weight: 700; background: rgba(91,141,239,.09); border: 1px solid rgba(91,141,239,.2); color: #5b8def; }
+#startBtn {
+display: block; width: 100%; padding: 16px;
+border-radius: 14px; border: none;
+background: linear-gradient(135deg,#5b8def,#7c6fef);
+color: white; font-family: inherit; font-size: 17px; font-weight: 900;
+cursor: pointer;
+box-shadow: 0 4px 20px rgba(91,141,239,0.4);
+}
+#startBtn:active { opacity: 0.85; }
+.card-note { font-size: 11px; color: #9aa0bc; margin-top: 12px; }
+
+/* App */
+#appWrap {
+display: none;
+flex-direction: column;
+height: 100vh; height: 100dvh;
+max-width: 540px; margin: 0 auto;
+}
+
+/* Header */
+.hdr {
+padding: calc(env(safe-area-inset-top,20px) + 8px) 14px 10px;
+background: rgba(255,255,255,0.6);
+backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+border-bottom: 1px solid rgba(255,255,255,0.7);
+display: flex; align-items: center; justify-content: space-between;
+flex-shrink: 0;
+}
+.logo { display: flex; align-items: center; gap: 9px; }
+.logo-ic {
+width: 36px; height: 36px; border-radius: 10px;
+background: linear-gradient(135deg,#5b8def,#a78bfa);
+display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.logo-name {
+font-size: 16px; font-weight: 900;
+background: linear-gradient(135deg,#5b8def,#a78bfa);
+-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.logo-sub { font-size: 10px; color: #9aa0bc; font-weight: 600; }
+.hdr-btns { display: flex; gap: 5px; }
+.hbtn {
+padding: 5px 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8);
+background: rgba(255,255,255,0.6); cursor: pointer;
+font-size: 11px; font-weight: 700; color: #5a6080; font-family: inherit;
+}
+.hbtn.on { background: linear-gradient(135deg,#5b8def,#7c6fef); color: white; border-color: transparent; }
+
+/* Subjects */
+.subs {
+display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px;
+background: rgba(255,255,255,0.3);
+backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+border-bottom: 1px solid rgba(255,255,255,0.5);
+flex-shrink: 0;
+}
+.subs::-webkit-scrollbar { display: none; }
+.sub {
+flex-shrink: 0; padding: 5px 12px; border-radius: 18px; cursor: pointer;
+font-family: inherit; font-size: 11px; font-weight: 700;
+border: 1px solid rgba(255,255,255,0.7); background: rgba(255,255,255,0.5);
+color: #5a6080; white-space: nowrap;
+}
+.sub.active { background: linear-gradient(135deg,#5b8def,#7c6fef); color: white; border-color: transparent; }
+
+/* Messages */
+.msgs {
+flex: 1; overflow-y: auto; padding: 14px 12px;
+display: flex; flex-direction: column; gap: 12px;
+-webkit-overflow-scrolling: touch;
+}
+.msgs::-webkit-scrollbar { display: none; }
+
+/* Welcome */
+.welcome {
+background: rgba(255,255,255,0.65);
+backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+border: 1px solid rgba(255,255,255,0.85);
+border-radius: 20px; padding: 20px 18px;
+}
+.w-title { font-size: 18px; font-weight: 900; margin-bottom: 5px; }
+.w-sub { font-size: 13px; color: #5a6080; line-height: 1.5; margin-bottom: 12px; }
+.qbtns { display: flex; flex-wrap: wrap; gap: 7px; }
+.qbtn {
+padding: 6px 12px; border-radius: 11px; cursor: pointer;
+font-family: inherit; font-size: 11.5px; font-weight: 700; color: #5b8def;
+border: 1.5px solid rgba(91,141,239,0.28); background: rgba(91,141,239,0.07);
+}
+
+/* Bubbles */
+.msg { display: flex; gap: 8px; align-items: flex-end; }
+.msg.user { flex-direction: row-reverse; }
+.av {
+width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.msg.ai .av { background: linear-gradient(135deg,#5b8def,#a78bfa); }
+.msg.user .av { background: linear-gradient(135deg,#f472b6,#fb923c); }
+.bub { max-width: 80%; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.6; font-weight: 500; }
+.msg.ai .bub {
+background: rgba(255,255,255,0.75);
+backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+border: 1px solid rgba(255,255,255,0.9);
+border-bottom-left-radius: 5px;
+}
+.msg.user .bub { background: linear-gradient(135deg,#5b8def,#7c6fef); color: white; border-bottom-right-radius: 5px; }
+.bub strong { font-weight: 800; }
+.bub em { font-style: italic; }
+.bub h3 { font-size: 14px; font-weight: 800; color: #5b8def; margin: 5px 0 2px; }
+.bub ul { padding-left: 16px; margin: 3px 0; }
+.bub li { margin: 2px 0; }
+.bub code { background: rgba(91,141,239,.13); padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+.bub pre { background: rgba(91,141,239,.08); border-radius: 8px; padding: 8px 10px; overflow-x: auto; margin: 5px 0; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+
+/* Thinking */
+.think-hdr { cursor: pointer; padding: 6px 11px; background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.25); border-radius: 10px; font-size: 11.5px; font-weight: 700; color: #7c6fef; margin-bottom: 5px; }
+.think-body { background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.2); border-radius: 10px; padding: 9px 12px; font-size: 12px; color: #5a6080; line-height: 1.6; font-style: italic; display: none; margin-bottom: 5px; }
+.think-body.open { display: block; }
+
+/* Typing */
+.typing-bub {
+background: rgba(255,255,255,0.75);
+backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+border: 1px solid rgba(255,255,255,0.9);
+border-radius: 18px; border-bottom-left-radius: 5px;
+padding: 12px 16px; display: flex; gap: 5px; align-items: center;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #5b8def; animation: dotb 1.3s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay: .15s; }
+.dot:nth-child(3) { animation-delay: .3s; }
+@keyframes dotb { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-6px);opacity:1} }
+
+/* Research */
+.res-ind { display: flex; align-items: center; gap: 7px; padding: 7px 12px; background: rgba(59,130,246,.07); border: 1px solid rgba(59,130,246,.2); border-radius: 11px; font-size: 12px; font-weight: 700; color: #3b82f6; }
+.rdot { width: 7px; height: 7px; border-radius: 50%; background: #3b82f6; animation: rp 1s ease-in-out infinite; }
+@keyframes rp { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
+
+/* Error */
+.err-bub { text-align: center; font-size: 13px; color: #e06c75; background: rgba(224,108,117,.1); border-radius: 11px; padding: 8px 14px; }
+
+/* Input */
+.inp-bar {
+padding: 8px 12px calc(env(safe-area-inset-bottom,0px) + 8px);
+background: rgba(255,255,255,0.6);
+backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+border-top: 1px solid rgba(255,255,255,0.7);
+flex-shrink: 0;
+}
+.inp-wrap {
+display: flex; align-items: flex-end; gap: 8px;
+background: rgba(255,255,255,0.7);
+border: 1.5px solid rgba(255,255,255,0.9);
+border-radius: 20px; padding: 6px 6px 6px 14px;
+}
+#msgInp {
+flex: 1; border: none; background: transparent;
+font-family: inherit; font-size: 15px; font-weight: 500; color: #1a1a2e;
+resize: none; max-height: 120px; min-height: 24px;
+line-height: 1.5; outline: none; padding: 2px 0;
+}
+#msgInp::placeholder { color: #9aa0bc; }
+#sendBtn {
+width: 36px; height: 36px; flex-shrink: 0;
+border-radius: 50%; border: none; cursor: pointer;
+background: linear-gradient(135deg,#5b8def,#7c6fef);
+color: white; font-size: 18px; font-family: inherit;
+display: flex; align-items: center; justify-content: center;
+}
+#sendBtn:active { opacity: 0.8; }
+.inp-hint { text-align: center; font-size: 10px; color: #9aa0bc; margin-top: 5px; font-weight: 600; }
+</style>
+
+</head>
 <body>
-<h2>JavaScript Test</h2>
-<button id="btn" style="padding:20px;font-size:18px;background:blue;color:white;border:none;border-radius:10px;cursor:pointer;">Klick mich!</button>
-<p id="result" style="margin-top:20px;font-size:16px;">Noch nicht geklickt</p>
+
+<!-- SPLASH -->
+
+<div id="splash">
+  <div class="card">
+    <span class="card-icon">🎓</span>
+    <div class="card-title">StudyMind Pro</div>
+    <div class="card-sub">Dein kostenloser KI-Lernassistent – kein Account, kein Key, sofort loslegen!</div>
+    <div class="chips">
+      <span class="chip">🧠 Thinking Mode</span>
+      <span class="chip">📐 Mathe</span>
+      <span class="chip">📚 Aufsätze</span>
+      <span class="chip">🔍 Recherche</span>
+      <span class="chip">🌿 Alle Fächer</span>
+    </div>
+    <button id="startBtn">🚀 Jetzt loslegen</button>
+    <div class="card-note">Kostenlos · Kein Abo · Kein Login</div>
+  </div>
+</div>
+
+<!-- APP -->
+
+<div id="appWrap">
+
+  <div class="hdr">
+    <div class="logo">
+      <div class="logo-ic">🎓</div>
+      <div>
+        <div class="logo-name">StudyMind Pro</div>
+        <div class="logo-sub">KI Lernassistent</div>
+      </div>
+    </div>
+    <div class="hdr-btns">
+      <button class="hbtn" id="thinkBtn">🧠 Thinking</button>
+      <button class="hbtn" id="resBtn">🔍 Recherche</button>
+      <button class="hbtn" id="clearBtn">🗑️</button>
+    </div>
+  </div>
+
+  <div class="subs" id="subsEl">
+    <div class="sub active">🌟 Alle Fächer</div>
+    <div class="sub">📐 Mathe</div>
+    <div class="sub">📚 Deutsch</div>
+    <div class="sub">🇬🇧 Englisch</div>
+    <div class="sub">⚛️ Physik</div>
+    <div class="sub">🧪 Chemie</div>
+    <div class="sub">🌿 Biologie</div>
+    <div class="sub">🏛️ Geschichte</div>
+  </div>
+
+  <div class="msgs" id="msgsEl">
+    <div class="welcome" id="welcomeEl">
+      <div class="w-title">🚀 Willkommen bei StudyMind Pro!</div>
+      <div class="w-sub">Ich helfe dir bei Hausaufgaben, erkläre schwierige Themen und unterstütze dich beim Lernen – komplett kostenlos!</div>
+      <div class="qbtns" id="qbtnsEl">
+        <button class="qbtn">📐 Pythagoras erklären</button>
+        <button class="qbtn">✍️ Aufsatz Tipps</button>
+        <button class="qbtn">🌿 Photosynthese</button>
+        <button class="qbtn">🎯 Lerntipps</button>
+        <button class="qbtn">🔍 Klimawandel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="inp-bar">
+    <div class="inp-wrap">
+      <textarea id="msgInp" placeholder="Frage stellen oder Aufgabe eingeben…" rows="1"></textarea>
+      <button id="sendBtn">↑</button>
+    </div>
+    <div class="inp-hint">🧠 Thinking · 🔍 Recherche · Enter zum Senden</div>
+  </div>
+
+</div>
+
 <script>
-document.getElementById('btn').addEventListener('click', function() {
-  document.getElementById('result').textContent = '✅ JavaScript funktioniert!';
-  document.getElementById('result').style.color = 'green';
+var SUBJECT_NAMES = ['Allgemein','Mathematik','Deutsch','Englisch','Physik','Chemie','Biologie','Geschichte'];
+var QUICK_QUESTIONS = [
+  'Erkläre mir den Satz des Pythagoras Schritt für Schritt',
+  'Wie schreibe ich einen guten Aufsatz?',
+  'Was ist Photosynthese? Erkläre es einfach',
+  'Was sind die besten Lerntipps für Prüfungen?',
+  'Recherchiere: Was ist Klimawandel?'
+];
+
+var subject = 'Allgemein';
+var history = [];
+var busy = false;
+var thinkMode = false;
+var resMode = false;
+
+// Start button
+document.getElementById('startBtn').addEventListener('click', function() {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('appWrap').style.display = 'flex';
 });
+
+// Subject pills
+var subEls = document.querySelectorAll('.sub');
+subEls.forEach(function(el, i) {
+  el.addEventListener('click', function() {
+    subEls.forEach(function(s) { s.classList.remove('active'); });
+    el.classList.add('active');
+    subject = SUBJECT_NAMES[i];
+  });
+});
+
+// Think / Res / Clear
+document.getElementById('thinkBtn').addEventListener('click', function() {
+  thinkMode = !thinkMode;
+  this.classList.toggle('on', thinkMode);
+  this.textContent = thinkMode ? '🧠 Thinking ✓' : '🧠 Thinking';
+});
+document.getElementById('resBtn').addEventListener('click', function() {
+  resMode = !resMode;
+  this.classList.toggle('on', resMode);
+  this.textContent = resMode ? '🔍 Recherche ✓' : '🔍 Recherche';
+});
+document.getElementById('clearBtn').addEventListener('click', clearChat);
+
+// Quick buttons
+var qbtns = document.querySelectorAll('.qbtn');
+qbtns.forEach(function(btn, i) {
+  btn.addEventListener('click', function() {
+    sendMessage(QUICK_QUESTIONS[i]);
+  });
+});
+
+// Textarea
+var msgInp = document.getElementById('msgInp');
+msgInp.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+msgInp.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage(this.value.trim());
+  }
+});
+document.getElementById('sendBtn').addEventListener('click', function() {
+  sendMessage(msgInp.value.trim());
+});
+
+// Scroll
+function scrollDown() {
+  var m = document.getElementById('msgsEl');
+  setTimeout(function() { m.scrollTop = m.scrollHeight; }, 80);
+}
+
+// Remove element
+function rmEl(id) {
+  var e = document.getElementById(id);
+  if (e) { e.parentNode.removeChild(e); }
+}
+
+// Hide welcome
+function hideWelcome() {
+  var w = document.getElementById('welcomeEl');
+  if (w) { w.parentNode.removeChild(w); }
+}
+
+// Format text
+function fmt(raw) {
+  return '<p>' + raw
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```([\s\S]*?)```/g,'<pre>$1</pre>')
+
+```
+.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+.replace(/\*(.*?)\*/g,'<em>$1</em>')
+.replace(/`(.*?)`/g,'<code>$1</code>')
+.replace(/^#{1,3} (.+)$/gm,'<h3>$1</h3>')
+.replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+.replace(/(<li>.*<\/li>\n?)+/gs,'<ul>$&</ul>')
+.replace(/\n\n/g,'</p><p>')
+.replace(/\n/g,'<br>')
+```
+
+- ‘</p>’;
+  }
+
+// Add messages
+function addUserMsg(text) {
+hideWelcome();
+var msgs = document.getElementById(‘msgsEl’);
+var d = document.createElement(‘div’);
+d.className = ‘msg user’;
+d.innerHTML = ‘<div class="bub">’ + text.replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/\n/g,’<br>’) + ‘</div><div class="av">😊</div>’;
+msgs.appendChild(d);
+scrollDown();
+}
+
+function addAIMsg(text) {
+var msgs = document.getElementById(‘msgsEl’);
+var d = document.createElement(‘div’);
+d.className = ‘msg ai’;
+d.innerHTML = ‘<div class="av">🤖</div><div class="bub">’ + fmt(text) + ‘</div>’;
+msgs.appendChild(d);
+scrollDown();
+}
+
+function addThinkMsg(thinkText, mainText) {
+var msgs = document.getElementById(‘msgsEl’);
+var d = document.createElement(‘div’);
+d.className = ‘msg ai’;
+var bodyId = ‘tb’ + Date.now();
+d.innerHTML = ‘<div class="av">🤖</div>’
++ ‘<div style="max-width:82%;display:flex;flex-direction:column;gap:5px;">’
++ ‘<div class="think-hdr">💭 Gedankengang ▼</div>’
++ ‘<div class="think-body" id="' + bodyId + '">’ + fmt(thinkText) + ‘</div>’
++ ‘<div class="bub" style="background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.9);border-radius:18px;">’ + fmt(mainText) + ‘</div>’
++ ‘</div>’;
+msgs.appendChild(d);
+d.querySelector(’.think-hdr’).addEventListener(‘click’, function() {
+document.getElementById(bodyId).classList.toggle(‘open’);
+});
+scrollDown();
+}
+
+function showTyping() {
+var msgs = document.getElementById(‘msgsEl’);
+var d = document.createElement(‘div’);
+d.className = ‘msg ai’; d.id = ‘typingEl’;
+d.innerHTML = ‘<div class="av" style="background:linear-gradient(135deg,#5b8def,#a78bfa)">🤖</div>’
++ ‘<div class="typing-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>’;
+msgs.appendChild(d);
+scrollDown();
+}
+
+function showResInd(q) {
+var msgs = document.getElementById(‘msgsEl’);
+var d = document.createElement(‘div’);
+d.id = ‘resInd’; d.className = ‘res-ind’;
+d.innerHTML = ‘<div class="rdot"></div> Recherchiere: <strong>’ + q + ‘</strong>’;
+msgs.appendChild(d);
+scrollDown();
+}
+
+function addErrMsg(text) {
+var msgs = document.getElementById(‘msgsEl’);
+var d = document.createElement(‘div’);
+d.className = ‘err-bub’; d.textContent = text;
+msgs.appendChild(d);
+scrollDown();
+}
+
+function clearChat() {
+history = [];
+var msgs = document.getElementById(‘msgsEl’);
+msgs.innerHTML = ‘’;
+var w = document.createElement(‘div’);
+w.className = ‘welcome’; w.id = ‘welcomeEl’;
+w.innerHTML = ‘<div class="w-title">👋 Neues Gespräch</div>’
++ ‘<div class="w-sub">Bereit für neue Fragen!</div>’
++ ‘<div class="qbtns"><button class="qbtn" id="cq1">📐 Mathe</button><button class="qbtn" id="cq2">🔍 Recherche</button></div>’;
+msgs.appendChild(w);
+document.getElementById(‘cq1’).addEventListener(‘click’, function() { sendMessage(‘Erkläre mir Pythagoras’); });
+document.getElementById(‘cq2’).addEventListener(‘click’, function() { sendMessage(‘Recherchiere: Was ist DNA?’); });
+}
+
+// Wikipedia
+async function doResearch(query) {
+try {
+var r1 = await fetch(‘https://de.wikipedia.org/w/api.php?action=query&list=search&srsearch=’ + encodeURIComponent(query) + ‘&format=json&origin=*&srlimit=1’);
+var d1 = await r1.json();
+if (!d1.query || !d1.query.search || !d1.query.search.length) return null;
+var pid = d1.query.search[0].pageid;
+var r2 = await fetch(‘https://de.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&pageids=’ + pid + ’&format=json&origin=*’);
+var d2 = await r2.json();
+var pages = d2.query && d2.query.pages;
+return pages && pages[pid] && pages[pid].extract ? pages[pid].extract.slice(0, 1500) : null;
+} catch(e) { return null; }
+}
+
+// Pollinations AI
+async function callAI(msgs) {
+var sys = ’Du bist StudyMind Pro, ein KI-Lernassistent für Schüler. Fach: ’ + subject + ’. ’
++ ’Antworte IMMER auf Deutsch. Sei freundlich und ermutigend. ’
++ ’Nutze **fett** für wichtige Begriffe. Bei Mathe zeige jeden Rechenschritt. ’
++ (thinkMode ? ’Schreibe deinen Denkprozess in <think>…</think> vor der Antwort. ’ : ‘’);
+
+var body = JSON.stringify({
+model: ‘openai’,
+messages: [{ role: ‘system’, content: sys }].concat(msgs),
+seed: 42,
+private: true
+});
+
+var res = await fetch(‘https://text.pollinations.ai/openai’, {
+method: ‘POST’,
+headers: { ‘Content-Type’: ‘application/json’ },
+body: body
+});
+
+if (!res.ok) throw new Error(’HTTP ’ + res.status);
+var data = await res.json();
+if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error(‘Keine Antwort’);
+return data.choices[0].message.content;
+}
+
+// Main send
+async function sendMessage(text) {
+if (busy || !text) return;
+msgInp.value = ‘’;
+msgInp.style.height = ‘auto’;
+
+addUserMsg(text);
+
+var userMsg = { role: ‘user’, content: text };
+
+var isResearch = resMode || /^(recherchiere|suche nach)/i.test(text);
+if (isResearch) {
+var q = text.replace(/^recherchiere:?\s*/i,’’).replace(/^suche nach:?\s*/i,’’).trim() || text;
+showResInd(q);
+var wiki = await doResearch(q);
+rmEl(‘resInd’);
+if (wiki) userMsg.content += ‘\n\n[Wikipedia]:\n’ + wiki + ‘\nNutze diese Info in deiner Antwort.’;
+}
+
+history.push(userMsg);
+busy = true;
+showTyping();
+
+try {
+var reply = await callAI(history);
+rmEl(‘typingEl’);
+
+```
+var thinkText = '';
+var mainReply = reply;
+var tm = reply.match(/<think>([\s\S]*?)<\/think>/i);
+if (tm) {
+  thinkText = tm[1].trim();
+  mainReply = reply.replace(/<think>[\s\S]*?<\/think>/i,'').trim();
+}
+
+history.push({ role: 'assistant', content: reply });
+
+if (thinkMode && thinkText) {
+  addThinkMsg(thinkText, mainReply);
+} else {
+  addAIMsg(mainReply);
+}
+```
+
+} catch(e) {
+rmEl(‘typingEl’);
+history.pop();
+addErrMsg(‘⚠️ Fehler: ’ + e.message + ’ – Bitte nochmal versuchen.’);
+}
+
+busy = false;
+}
 </script>
+
 </body>
 </html>
