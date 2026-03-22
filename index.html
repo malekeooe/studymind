@@ -243,7 +243,6 @@ scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
     <div class="key-hint">
       Kostenlos auf <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> → „Get API Key"
     </div>
-    <p id="keyErr" class="key-err">⚠️ Bitte gültigen API-Key eingeben!</p>
     <button class="go-btn" id="goBtn">🚀 Loslegen</button>
     <p class="key-note">Key bleibt nur auf deinem Gerät gespeichert</p>
   </div>
@@ -350,22 +349,21 @@ var resMode = false;
 var attachedFile = null;
 
 // ── Splash ─────────────────────────────────────────────
-document.getElementById('goBtn').addEventListener('click', function() {
+function doStart() {
   var key = document.getElementById('keyInput').value.trim();
-  var errEl = document.getElementById('keyErr');
-  if (!key || key.length < 10) {
-    errEl.style.display = 'block';
-    setTimeout(function() { errEl.style.display = 'none'; }, 3000);
-    return;
+  if (!key) { 
+    document.getElementById('keyInput').style.border = '2px solid #ef4444';
+    return; 
   }
   API_KEY = key;
   GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + API_KEY;
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-});
+}
 
+document.getElementById('goBtn').addEventListener('click', doStart);
 document.getElementById('keyInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') document.getElementById('goBtn').click();
+  if (e.key === 'Enter') doStart();
 });
 
 // ── UI ─────────────────────────────────────────────────
